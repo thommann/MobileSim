@@ -568,7 +568,7 @@ public:
      *  @sa processAll()
      *  @sa stat
      */
-    bool processSession() throw(DeletionRequest, Disconnected);
+    bool processSession();
 
     /** Call processSession() on all EmulatePioneer instances.
       * If instance indicated client disconnect and its deleteOnDisconnect value is
@@ -594,11 +594,11 @@ protected:
     void acceptNewClient(unsigned int maxTime = 0);
 
     /** End session, close connection, clean up */
-    void endSession() throw (DeletionRequest, Disconnected);
+    void endSession();
 
-    void handlePacket(ArRobotPacket *pkt) throw (DeletionRequest, Disconnected);
-    bool handleSyncPacket(ArRobotPacket *pkt) throw (DeletionRequest, Disconnected);
-    bool handleCommand(ArRobotPacket *pkt) throw (DeletionRequest, Disconnected);
+    void handlePacket(ArRobotPacket *pkt);
+    bool handleSyncPacket(ArRobotPacket *pkt);
+    bool handleCommand(ArRobotPacket *pkt);
 
     void newSession();
     void setupSessionClientConnection();

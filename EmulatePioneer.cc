@@ -500,7 +500,7 @@ void EmulatePioneer::readClientInput(unsigned int maxTime)
   }
 }
 
-void EmulatePioneer::handlePacket(ArRobotPacket *pkt) throw(DeletionRequest, Disconnected)
+void EmulatePioneer::handlePacket(ArRobotPacket *pkt)
 {
 
   if(!session)
@@ -532,7 +532,7 @@ void EmulatePioneer::handlePacket(ArRobotPacket *pkt) throw(DeletionRequest, Dis
     handleCommand(pkt);
 }
 
-bool EmulatePioneer::handleSyncPacket(ArRobotPacket *pkt) throw (DeletionRequest, Disconnected)
+bool EmulatePioneer::handleSyncPacket(ArRobotPacket *pkt)
 {
   if(session->handshakeAttempt++ >= 10)
   {
@@ -762,7 +762,7 @@ int EmulatePioneer::processAll(int maxTime)
   return allStat;
 }
 
-bool EmulatePioneer::processSession() throw (DeletionRequest, Disconnected)
+bool EmulatePioneer::processSession()
 {
     ArTime time;
 
@@ -893,7 +893,7 @@ bool EmulatePioneer::processSession() throw (DeletionRequest, Disconnected)
 
 
 // Command implementations:
-bool EmulatePioneer::handleCommand(ArRobotPacket *pkt) throw (DeletionRequest, Disconnected)
+bool EmulatePioneer::handleCommand(ArRobotPacket *pkt)
 {
   //printf("handling command packet with ID %d", pkt->getID());fflush(stdout);
 
@@ -1392,63 +1392,6 @@ bool EmulatePioneer::handleCommand(ArRobotPacket *pkt) throw (DeletionRequest, D
        robotInterface->resetSimulatorPose();
        break;
       
-    case ArCommands::SIM_MODEL_CONFIG:
-      if(!myCommercial)
-      {
-        ArLog::log(ArLog::Normal, "Ignoring new model config packet, because the --commercial flag is not set");
-        warn("Ignoring new model config packet, because the --commercial flag is not set");
-        break;
-      }
-      char typeArgBuff[256];
-      pkt->bufToByte();  // strip the 'STRARG' (0x2B) // No idea why this was here in the comDataN sends
-      pkt->bufToStr((char*)typeArgBuff, 255);
-      //ArLog::log(ArLog::Normal, "\tMOBILESIM_MODEL_INIT_BY_TCP: Packet Message: %s", typeArgBuff);
-      if(strcmp(typeArgBuff, "sendPositionConfig") == 0)
-      {
-        robotInterface->configPosition(pkt);
-      }
-      else if(strcmp(typeArgBuff, "sendVelParams") == 0)
-      {
-        robotInterface->configPositionVelVals(pkt);
-      }
-      else if(strcmp(typeArgBuff, "sendLaserNums") == 0)
-      {
-        int numLasers = (int)pkt->bufToByte();
-        //ArLog::log(ArLog::Normal, "\tnumLasers: %d", numLasers);
-        // TODO: add 'numLasers' stub lasers to the model (multiple lasers not yet supported by MobileSim)
-        robotInterface->addLaser();
-
-      }
-      else if(strcmp(typeArgBuff, "sendLaserConfig") == 0)
-      {
-        robotInterface->configLaser(pkt);
-      }
-      /* - Obsolete, 'sendSonarConfig' handles all sonar units
-      else if(strcmp(typeArgBuff, "sendSonarNums") == 0)
-      {
-        int numSonars = (int)pkt->bufToByte();
-        ArLog::log(ArLog::Normal, "\tnumSonars: %d", numSonars);
-        // TODO: add 'numSonars' stub lasers to the model
-      }
-      */
-      else if(strcmp(typeArgBuff, "sendSonarConfig") == 0)
-      {
-        robotInterface->configSonar(pkt);
-      }
-      else if(strcmp(typeArgBuff, "sendBatteryConfig") == 0)
-      {
-        // TODO: add model_battery to stage, or just add battery parameters to model_position (may be much easier considering the battery's sensitivity to driving)
-        robotInterface->configBattery(pkt);
-      }
-      else if(strcmp(typeArgBuff, "sendBatteryChargeState") == 0)
-      {
-        robotInterface->updateBatteryChargeState(pkt);
-      }
-
-      break;
-
-
-
     case OLD_LRF_ENABLE:
        if(!SRISimLaserCompat) 
        {
@@ -1901,7 +1844,7 @@ bool EmulatePioneer::handleCommand(ArRobotPacket *pkt) throw (DeletionRequest, D
   return true;
 } // handleCommand()
 
-void EmulatePioneer::endSession() throw (DeletionRequest, Disconnected)
+void EmulatePioneer::endSession()
 {
   if(!sessionActive)
   {
